@@ -146,13 +146,114 @@ body.theme-minimal .price-badge{color:#fff}
 </style>
 </head>
 <body class="theme-classic">
+<!-- ===== LANDING PAGE ===== -->
+<div id="landing-page" style="
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#7b1e12,#c84b2f,#ff7a18);
+font-family:'Nunito',sans-serif;
+color:white;
+padding:20px;
+position:relative;
+overflow:hidden;
+z-index:2;
+">
+
+<div style="
+width:100%;
+max-width:420px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(12px);
+border-radius:20px;
+padding:35px 25px;
+text-align:center;
+box-shadow:0 10px 40px rgba(0,0,0,.4);
+position:relative;
+z-index:2;
+">
+
+LOGO
+<div style="
+font-size:40px;
+margin-bottom:5px;
+">
+📱
+</div>
+
+<h1 style="
+font-size:34px;
+font-weight:900;
+letter-spacing:1px;
+margin-bottom:5px;
+">
+KarQR
+</h1>
+<p style="opacity:.9;margin-bottom:30px">
+Digital Menu • Scan QR • Easy for Hotels
+</p>
+
+<button onclick="openMenu()" style="
+padding:14px 28px;
+border:none;
+border-radius:30px;
+font-size:16px;
+font-weight:700;
+margin:10px;
+cursor:pointer;
+background:white;
+color:#C84B2F;
+">
+🍽 See Menu
+</button>
+<!-- Floating WhatsApp -->
+<button onclick="contactAdmin()" style="
+position:fixed;
+bottom:20px;
+right:20px;
+width:55px;
+height:55px;
+border-radius:50%;
+border:none;
+background:#25D366;
+color:white;
+font-size:26px;
+cursor:pointer;
+box-shadow:0 5px 15px rgba(0,0,0,.4);
+z-index:5;
+">
+💬
+</button>
+<button onclick="contactAdmin()" style="
+padding:14px 28px;
+border:none;
+border-radius:30px;
+font-size:16px;
+font-weight:700;
+margin:10px;
+cursor:pointer;
+background:#111;
+color:white;
+">
+📞 Contact Admin for Custom QR
+</button>
+
+<p style="margin-top:40px;font-size:12px;opacity:.7">
+Powered by Karan Smart Menu
+</p>
+</div>
+</div>
 
 <!-- ===== CUSTOMER VIEW ===== -->
-<div id="customer-view">
+<div id="customer-view" style="display:none">
   <div class="menu-header">
     <h1 id="rest-name">Our Menu</h1>
-    <p id="rest-tagline">Freshly Prepared · Pure Veg</p>
+    <p id="rest-tagline">Scan QR • View Menu • Order Easy</p>
+
     <div class="header-line"></div>
+    
+      
   </div>
   <div class="tab-bar" id="tab-bar"></div>
   <div class="menu-body" id="menu-body"></div>
@@ -476,6 +577,14 @@ function renderSection(catId){
     note.textContent='📦 '+data.packing;
     body.appendChild(note);
   }
+  const foot=document.createElement('div');
+foot.style.textAlign='center';
+foot.style.fontSize='12px';
+foot.style.marginTop='15px';
+foot.style.opacity='0.7';
+foot.textContent='Digital Menu by Karan Smart Menu';
+body.appendChild(foot);
+
 }
 
 // ===== LOGIN =====
@@ -611,6 +720,18 @@ function deleteItem(id){
   renderItemsTable();
   toast('Item deleted');
 }
+function openMenu(){
+  document.getElementById('landing-page').style.display='none';
+  document.getElementById('customer-view').style.display='block';
+  renderMenu();
+}
+
+function contactAdmin(){
+  window.open(
+    "https://wa.me/916238093007?text=Hello%20I%20want%20Custom%20QR%20Menu",
+    "_blank"
+  );
+}
 
 function editItem(id){
   const item=data.items.find(i=>i.id===id);
@@ -664,7 +785,15 @@ function toast(msg){
 
 // ===== INIT =====
 loadData();
-renderMenu();
+window.onload = function(){
+
+const landing = document.getElementById("landing-page");
+const customer = document.getElementById("customer-view");
+
+if (landing) landing.style.display = "flex";
+if (customer) customer.style.display = "none";
+
+};
 </script>
 </body>
 </html>
