@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Restaurant Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ===== BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;min-height:100vh;background:#FDF6EE;color:#2C1A0E}
+
+/* ===== THEMES ===== */
+body.theme-classic{--bg:#FDF6EE;--primary:#C84B2F;--primary-dark:#9C3520;--accent:#D4960A;--card:#fff;--card-border:#F0D5CC;--text:#2C1A0E;--text-muted:#6B4226;--tab-bg:#9C3520;--badge-bg:#C84B2F;--header-bg:#C84B2F}
+body.theme-dark{--bg:#111;--primary:#D4AF37;--primary-dark:#B8960A;--accent:#FF6B35;--card:#1e1e1e;--card-border:#333;--text:#eee;--text-muted:#888;--tab-bg:#0a0a0a;--badge-bg:#D4AF37;--header-bg:#0a0a0a}
+body.theme-minimal{--bg:#f8f8f8;--primary:#111;--primary-dark:#333;--accent:#111;--card:#fff;--card-border:#e0e0e0;--text:#111;--text-muted:#666;--tab-bg:#111;--badge-bg:#111;--header-bg:#fff}
+body.theme-green{--bg:#F1F8F1;--primary:#2E7D32;--primary-dark:#1B5E20;--accent:#558B2F;--card:#fff;--card-border:#C8E6C9;--text:#1B2E1B;--text-muted:#4a6a4a;--tab-bg:#1B5E20;--badge-bg:#2E7D32;--header-bg:#2E7D32}
+body.theme-street{--bg:#111;--primary:#FF5722;--primary-dark:#BF360C;--accent:#FFC107;--card:#1e1e1e;--card-border:#2a2a2a;--text:#fff;--text-muted:#aaa;--tab-bg:#0a0a0a;--badge-bg:#FF5722;--header-bg:#FF5722}
+body.theme-pastel{--bg:#FFF5F7;--primary:#C2185B;--primary-dark:#880E4F;--accent:#E91E63;--card:#fff;--card-border:#F8BBD0;--text:#2a0a14;--text-muted:#7a3a54;--tab-bg:#880E4F;--badge-bg:#C2185B;--header-bg:#C2185B}
+
+body{background:var(--bg);color:var(--text)}
+
+/* ===== CUSTOMER VIEW ===== */
+#customer-view{display:block}
+#admin-login,#admin-panel{display:none}
+
+.menu-header{background:var(--header-bg);padding:32px 20px 20px;text-align:center;position:relative;overflow:hidden}
+.menu-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0,rgba(255,255,255,.03) 2px,transparent 2px,transparent 12px)}
+.menu-header h1{font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:#fff;position:relative}
+body.theme-minimal .menu-header h1{color:#111}
+body.theme-minimal .menu-header{background:#fff;border-bottom:2px solid #111}
+.menu-header p{color:rgba(255,255,255,.8);font-size:.85rem;margin-top:5px;letter-spacing:2px;text-transform:uppercase;position:relative}
+body.theme-minimal .menu-header p{color:#666}
+.header-line{width:50px;height:3px;background:var(--accent);margin:10px auto 0;border-radius:2px;position:relative}
+
+.tab-bar{display:flex;overflow-x:auto;background:var(--tab-bg);padding:0 8px;scrollbar-width:none;position:sticky;top:0;z-index:50}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:12px 16px;color:rgba(255,255,255,.6);font-size:.8rem;font-weight:700;letter-spacing:.5px;cursor:pointer;border:none;background:none;border-bottom:3px solid transparent;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;text-transform:uppercase}
+.tab-btn.active{color:#fff;border-bottom-color:var(--accent)}
+
+.menu-body{padding:18px 14px 70px;max-width:540px;margin:0 auto}
+.section-title{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--primary);margin:6px 0 14px;padding-bottom:7px;border-bottom:2px solid var(--card-border)}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.menu-grid.single{grid-template-columns:1fr}
+.menu-card{background:var(--card);border-radius:14px;padding:13px;border:1.5px solid var(--card-border);display:flex;flex-direction:column;transition:transform .15s}
+.menu-card:hover{transform:translateY(-2px)}
+.card-name{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px}
+.card-sub{font-size:.75rem;color:var(--text-muted);margin-bottom:4px;font-weight:600}
+.card-desc{font-size:.75rem;color:var(--text-muted);line-height:1.5;margin-bottom:9px;flex:1}
+.card-footer{display:flex;justify-content:flex-end}
+.price-badge{background:var(--badge-bg);color:#fff;font-size:.88rem;font-weight:800;padding:4px 12px;border-radius:20px}
+body.theme-dark .price-badge{color:#111}
+body.theme-minimal .price-badge{color:#fff}
+
+.thali-card{background:var(--card);border-radius:14px;padding:15px;border:1.5px solid var(--card-border);margin-bottom:10px;transition:transform .15s}
+.thali-card:hover{transform:translateY(-2px)}
+.thali-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
+.thali-name{font-family:'Playfair Display',serif;font-size:1.08rem;font-weight:700;color:var(--text)}
+.thali-sub{font-size:.75rem;color:var(--text-muted);margin-top:2px;font-weight:600}
+.thali-desc{font-size:.78rem;color:var(--text-muted);line-height:1.55}
+
+.packing-note{background:var(--primary);color:#fff;text-align:center;padding:11px;font-size:.85rem;font-weight:700;border-radius:10px;margin-top:8px}
+
+.cat-label{font-size:.75rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--primary);margin:18px 0 9px}
+
+/* ===== ADMIN TRIGGER ===== */
+.admin-trigger{position:fixed;bottom:18px;right:18px;background:var(--primary);color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;z-index:100;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+
+/* ===== LOGIN ===== */
+#admin-login{min-height:100vh;display:none;align-items:center;justify-content:center;background:#0f0f0f}
+.login-box{background:#1a1a1a;border:1px solid #333;border-radius:18px;padding:40px 32px;width:320px;text-align:center}
+.login-box h2{font-family:'Playfair Display',serif;color:#fff;font-size:1.6rem;margin-bottom:6px}
+.login-box p{color:#666;font-size:.85rem;margin-bottom:28px}
+.login-box input{width:100%;padding:12px 16px;background:#111;border:1px solid #333;border-radius:10px;color:#fff;font-size:.95rem;font-family:'Nunito',sans-serif;margin-bottom:14px;outline:none;transition:border .2s}
+.login-box input:focus{border-color:#C84B2F}
+.login-box button{width:100%;padding:13px;background:#C84B2F;color:#fff;border:none;border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:background .2s}
+.login-box button:hover{background:#9C3520}
+.login-err{color:#ff6b6b;font-size:.82rem;margin-top:8px;display:none}
+
+/* ===== ADMIN PANEL ===== */
+#admin-panel{min-height:100vh;background:#0f0f0f;color:#eee;display:none}
+.admin-header{background:#1a1a1a;border-bottom:1px solid #333;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.admin-header h2{font-family:'Playfair Display',serif;color:#fff;font-size:1.3rem}
+.admin-header-btns{display:flex;gap:10px}
+.abtn{padding:8px 16px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;border:none;transition:all .2s}
+.abtn-primary{background:#C84B2F;color:#fff}
+.abtn-primary:hover{background:#9C3520}
+.abtn-ghost{background:transparent;border:1px solid #444;color:#ccc}
+.abtn-ghost:hover{border-color:#888;color:#fff}
+.abtn-danger{background:#7f1d1d;color:#fca5a5}
+.abtn-danger:hover{background:#991b1b}
+
+.admin-body{padding:20px;max-width:800px;margin:0 auto}
+
+/* Sections */
+.admin-section{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:20px;margin-bottom:18px}
+.admin-section h3{font-size:.95rem;font-weight:700;color:#fff;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #2a2a2a;display:flex;align-items:center;gap:8px}
+.admin-section h3 span{background:#C84B2F;color:#fff;font-size:.7rem;padding:2px 8px;border-radius:20px}
+
+/* Inputs */
+.form-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.form-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px}
+.form-group label{font-size:.75rem;color:#888;font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+.form-group input,.form-group textarea,.form-group select{background:#111;border:1px solid #333;border-radius:8px;color:#eee;padding:9px 12px;font-size:.88rem;font-family:'Nunito',sans-serif;outline:none;transition:border .2s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:#C84B2F}
+.form-group textarea{resize:vertical;min-height:60px}
+.form-group select option{background:#1a1a1a}
+
+/* Theme picker */
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.theme-opt{border:2px solid #333;border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.theme-opt.active{border-color:#C84B2F}
+.theme-opt:hover{border-color:#666}
+.theme-swatch{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
+.theme-name{font-size:.75rem;color:#ccc;padding:5px 8px;background:#111;text-align:center;font-weight:600}
+
+/* Category list */
+.cat-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.cat-item{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.cat-item-name{flex:1;font-size:.9rem;color:#eee;font-weight:600}
+.cat-drag{color:#555;cursor:grab;font-size:1.1rem}
+
+/* Item table */
+.items-table{width:100%;border-collapse:collapse}
+.items-table th{font-size:.72rem;color:#666;font-weight:700;letter-spacing:.5px;text-align:left;padding:6px 8px;border-bottom:1px solid #2a2a2a;text-transform:uppercase}
+.items-table td{padding:8px;border-bottom:1px solid #1e1e1e;vertical-align:middle}
+.items-table tr:last-child td{border:none}
+.item-row-name{font-size:.88rem;color:#eee;font-weight:600}
+.item-row-desc{font-size:.75rem;color:#666;margin-top:2px}
+.item-price{font-size:.88rem;color:#C84B2F;font-weight:700;white-space:nowrap}
+.item-actions{display:flex;gap:6px;justify-content:flex-end}
+.ibtn{padding:5px 10px;border-radius:6px;font-size:.75rem;font-weight:700;cursor:pointer;border:none;font-family:'Nunito',sans-serif}
+.ibtn-edit{background:#1e3a5f;color:#93c5fd}
+.ibtn-del{background:#3f1a1a;color:#fca5a5}
+
+/* Add item form */
+.add-item-form{background:#111;border:1px solid #2a2a2a;border-radius:10px;padding:14px;margin-top:10px}
+.add-item-form h4{font-size:.8rem;color:#888;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Packing note */
+#packing-input{width:100%}
+
+/* Toast */
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1a1a1a;border:1px solid #C84B2F;color:#fff;padding:10px 22px;border-radius:30px;font-size:.85rem;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+</style>
+</head>
+<body class="theme-classic">
+
+<!-- ===== CUSTOMER VIEW ===== -->
+<div id="customer-view">
+  <div class="menu-header">
+    <h1 id="rest-name">Our Menu</h1>
+    <p id="rest-tagline">Freshly Prepared · Pure Veg</p>
+    <div class="header-line"></div>
+  </div>
+  <div class="tab-bar" id="tab-bar"></div>
+  <div class="menu-body" id="menu-body"></div>
+  <button class="admin-trigger" onclick="showLogin()">⚙ Admin</button>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div id="admin-login" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:#0f0f0f">
+  <div class="login-box">
+    <h2>Admin Login</h2>
+    <p>Only you can access this panel</p>
+    <input type="password" id="pwd-input" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button onclick="doLogin()">Login</button>
+    <p class="login-err" id="login-err">Wrong password. Try again.</p>
+    <p style="margin-top:18px;font-size:.78rem;color:#444;cursor:pointer" onclick="showCustomer()">← Back to menu</p>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <h2>Menu Manager</h2>
+    <div class="admin-header-btns">
+      <button class="abtn abtn-ghost" onclick="showCustomer()">← View Menu</button>
+      <button class="abtn abtn-primary" onclick="saveAll()">Save & Publish</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- Restaurant Info -->
+    <div class="admin-section">
+      <h3>Restaurant Info <span>Visible to customers</span></h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Restaurant Name</label>
+          <input type="text" id="inp-name" placeholder="e.g. Raju Bhai Dhaba">
+        </div>
+        <div class="form-group">
+          <label>Tagline</label>
+          <input type="text" id="inp-tagline" placeholder="e.g. Fresh · Homemade · Pure Veg">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Packing Charge Note</label>
+          <input type="text" id="inp-packing" placeholder="e.g. Packing Charge Extra ₹10/- Per Dish">
+        </div>
+      </div>
+    </div>
+
+    <!-- Theme -->
+    <div class="admin-section">
+      <h3>Menu Style / Theme</h3>
+      <div class="theme-grid">
+        <div class="theme-opt active" data-theme="theme-classic" onclick="pickTheme(this)">
+          <div class="theme-swatch" style="background:#C84B2F">
+            <span style="color:#fff;font-size:9px;font-weight:700">ITEM</span>
+            <span style="background:#fff;color:#C84B2F;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:700">₹80</span>
+          </div>
+          <div class="theme-name">Classic Indian</div>
+        </div>
+        <div class="theme-opt" data-theme="theme-dark" onclick="pickTheme(this)">
+          <div class="theme-swatch" style="background:#111">
+            <span style="color:#eee;font-size:9px;font-weight:700">ITEM</span>
+            <span style="color:#D4AF37;font-size:9px;font-weight:700">₹80</span>
+          </div>
+          <div class="theme-name">Dark Luxury</div>
+        </div>
+        <div class="theme-opt" data-theme="theme-minimal" onclick="pickTheme(this)">
+          <div class="theme-swatch" style="background:#f8f8f8;border-bottom:1px solid #ddd">
+            <span style="color:#111;font-size:9px;font-weight:700">ITEM</span>
+            <span style="color:#111;font-size:9px;font-weight:700">₹80</span>
+          </div>
+          <div class="theme-name">Fresh Minimal</div>
+        </div>
+        <div class="theme-opt" data-theme="theme-green" onclick="pickTheme(this)">
+          <div class="theme-swatch" style="background:#2E7D32">
+            <span style="color:#fff;font-size:9px;font-weight:700">ITEM</span>
+            <span style="background:#fff;color:#2E7D32;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:700">₹80</span>
+          </div>
+          <div class="theme-name">Green Natural</div>
+        </div>
+        <div class="theme-opt" data-theme="theme-street" onclick="pickTheme(this)">
+          <div class="theme-swatch" style="background:#FF5722">
+            <span style="color:#fff;font-size:9px;font-weight:700">ITEM</span>
+            <span style="background:#111;color:#FF5722;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:700">₹80</span>
+          </div>
+          <div class="theme-name">Bold Street</div>
+        </div>
+        <div class="theme-opt" data-theme="theme-pastel" onclick="pickTheme(this)">
+          <div class="theme-swatch" style="background:#FFF5F7">
+            <span style="color:#C2185B;font-size:9px;font-weight:700">ITEM</span>
+            <span style="background:#C2185B;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;font-weight:700">₹80</span>
+          </div>
+          <div class="theme-name">Pastel Soft</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="admin-section">
+      <h3>Menu Categories (Tabs)</h3>
+      <div class="cat-list" id="cat-list"></div>
+      <div class="form-row" style="margin-bottom:0">
+        <div class="form-group" style="flex:2">
+          <label>New Category Name</label>
+          <input type="text" id="new-cat-name" placeholder="e.g. Drinks, Starters...">
+        </div>
+        <div class="form-group" style="flex:0;justify-content:flex-end;padding-top:20px">
+          <button class="abtn abtn-primary" onclick="addCategory()" style="white-space:nowrap">+ Add Tab</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="admin-section">
+      <h3>Menu Items <span id="item-count-badge">0 items</span></h3>
+      <div class="form-row" style="margin-bottom:12px">
+        <div class="form-group">
+          <label>Filter by category</label>
+          <select id="filter-cat" onchange="renderItemsTable()">
+            <option value="all">All Categories</option>
+          </select>
+        </div>
+      </div>
+      <table class="items-table" id="items-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th style="text-align:right">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="items-tbody"></tbody>
+      </table>
+
+      <div class="add-item-form">
+        <h4>+ Add New Item</h4>
+        <div class="form-row">
+          <div class="form-group" style="flex:2">
+            <label>Item Name</label>
+            <input type="text" id="new-item-name" placeholder="e.g. Paneer Biryani">
+          </div>
+          <div class="form-group">
+            <label>Gujarati Name</label>
+            <input type="text" id="new-item-guj" placeholder="optional">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:3">
+            <label>Description / Includes</label>
+            <input type="text" id="new-item-desc" placeholder="e.g. Rice, Raita, Salad">
+          </div>
+          <div class="form-group">
+            <label>Price (₹)</label>
+            <input type="number" id="new-item-price" placeholder="120">
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom:0">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="new-item-cat"></select>
+          </div>
+          <div class="form-group">
+            <label>Display as</label>
+            <select id="new-item-type">
+              <option value="card">Card (2-column)</option>
+              <option value="thali">Full-width (Thali style)</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:0;justify-content:flex-end;padding-top:20px">
+            <button class="abtn abtn-primary" onclick="addItem()" style="white-space:nowrap">Add Item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="admin-section">
+      <h3>Settings</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Change Admin Password</label>
+          <input type="password" id="new-pwd" placeholder="New password">
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="confirm-pwd" placeholder="Confirm new password">
+        </div>
+        <div class="form-group" style="flex:0;justify-content:flex-end;padding-top:20px">
+          <button class="abtn abtn-ghost" onclick="changePwd()" style="white-space:nowrap">Update</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const DEFAULT_PWD = 'admin123';
+
+let data = {
+  name: 'Our Menu',
+  tagline: 'Freshly Prepared · Pure Veg',
+  packing: 'Packing Charge Extra ₹10/- Per Dish',
+  theme: 'theme-classic',
+  pwd: DEFAULT_PWD,
+  categories: [
+    {id:'thali', name:'Thali'},
+    {id:'paratha', name:'Paratha'},
+    {id:'khichadi', name:'Khichadi'},
+    {id:'rice', name:'Rice'},
+    {id:'other', name:'Other'}
+  ],
+  items: [
+    {id:1,name:'Gujarati Fix Thali',guj:'ગુજરાતી ફિક્સ થાળી',desc:'1 Sabji · 1 Kathol · Dal Rice · 5 Roti · Butter Milk · Papad · Salad · Achar',price:100,cat:'thali',type:'thali'},
+    {id:2,name:'Rajsthani Fix Thali',guj:'રાજસ્થાની ફિક્સ થાળી',desc:'1 Aloo Matter · 1 Kathol · Dal Rice · 5 Roti · Papad · Butter Milk · Salad · Achar',price:100,cat:'thali',type:'thali'},
+    {id:3,name:'Punjabi Fix Thali',guj:'પંજાબી ફિક્સ થાળી',desc:'1 Veg Sabji · 1 Paneer Sabji · Jeera Rice · Dal Fry · 5 Roti · 2 Lachha Paratha · Butter Milk · Papad · Salad · Achar',price:110,cat:'thali',type:'thali'},
+    {id:4,name:'Kathiyawadi Fix Thali',guj:'કાઠિયાવાડી ફિક્સ થાળી',desc:'Lasaniya Aloo · Sev Tomato · 2 Bhakhari · 5 Roti · Dal Rice · Papad · Butter Milk · Salad · Achar',price:110,cat:'thali',type:'thali'},
+    {id:5,name:'Regular Thali',guj:'રેગ્યુલર થાળી',desc:'5 Roti · 1 Sabji · 1 Kathol · Dal · Rice · Salad',price:70,cat:'thali',type:'card'},
+    {id:6,name:'Roti Sabji',guj:'રોટલી શાક',desc:'4 Roti · 1 Sabji · Salad',price:50,cat:'thali',type:'card'},
+    {id:7,name:'Chole Puri',guj:'છોલે પૂરી',desc:'5 Puri · Chole · Salad',price:80,cat:'thali',type:'card'},
+    {id:8,name:'Puri Sabji',guj:'પૂરી શાક',desc:'5 Puri · 1 Sabji · 1 Kathol · Salad',price:70,cat:'thali',type:'card'},
+    {id:9,name:'Dal Baati',guj:'દાળ બાટી',desc:'3 Baati · Dal · Lasan · Chatni · Salad',price:90,cat:'thali',type:'thali'},
+    {id:10,name:'Veg Paratha',guj:'વેજ પરાઠા',desc:'1 Paratha · Dahi · Salad · Achar',price:70,cat:'paratha',type:'card'},
+    {id:11,name:'Chole Paratha',guj:'છોલે પરાઠા',desc:'3 Paratha · Chole · Salad',price:80,cat:'paratha',type:'card'},
+    {id:12,name:'Cheese Paratha',guj:'ચીઝ પરાઠા',desc:'1 Paratha · Dahi · Salad · Achar',price:100,cat:'paratha',type:'card'},
+    {id:13,name:'Paneer Paratha',guj:'પનીર પરાઠા',desc:'1 Paratha · Dahi · Salad · Achar',price:80,cat:'paratha',type:'card'},
+    {id:14,name:'Aloo Paratha',guj:'આળુ પરાઠા',desc:'1 Aloo Paratha · Dahi · Salad · Achar',price:60,cat:'paratha',type:'card'},
+    {id:15,name:'Paneer Khichadi',guj:'પનીર ખીચડી',desc:'Fry Paneer Khichadi · Papad · Salad',price:100,cat:'khichadi',type:'card'},
+    {id:16,name:'Cheese Khichadi',guj:'ચીઝ ખીચડી',desc:'Fry Cheese Khichadi · Papad · Salad',price:130,cat:'khichadi',type:'card'},
+    {id:17,name:'Veg Khichadi',guj:'વેજ ખીચડી',desc:'Fry Veg Khichadi · Dal · Papad · Salad',price:100,cat:'khichadi',type:'card'},
+    {id:18,name:'Dal Khichadi',guj:'દાળ ખીચડી',desc:'Fry Khichadi · Papad · Salad',price:80,cat:'khichadi',type:'card'},
+    {id:19,name:'Dal Rice',guj:'દાળ ભાત',desc:'Dal Rice · Papad · Salad',price:50,cat:'rice',type:'card'},
+    {id:20,name:'Jeera Rice',guj:'જીરા રાઈસ',desc:'Flavourful Jeera Rice',price:70,cat:'rice',type:'card'},
+    {id:21,name:'Masala Rice',guj:'મસાલા રાઈસ',desc:'Spiced Masala Rice',price:70,cat:'rice',type:'card'},
+    {id:22,name:'Veg Pulav',guj:'વેજ પુલાવ',desc:'Vegetable Pulav',price:90,cat:'rice',type:'card'},
+    {id:23,name:'Veg Biryani',guj:'વેજ બિરયાની',desc:'Aromatic Vegetable Biryani',price:100,cat:'rice',type:'card'},
+    {id:24,name:'Paneer Biryani',guj:'પનીર બિરયાની',desc:'Rich Paneer Biryani',price:120,cat:'rice',type:'card'},
+    {id:25,name:'Cheese Biryani',guj:'ચીઝ બિરયાની',desc:'Cheese loaded Biryani',price:130,cat:'rice',type:'card'},
+  ]
+};
+
+// Load from localStorage
+function loadData(){
+  try{const s=localStorage.getItem('menudata');if(s)data=JSON.parse(s)}catch(e){}
+}
+function saveData(){
+  localStorage.setItem('menudata',JSON.stringify(data));
+}
+
+// ===== CUSTOMER RENDER =====
+function renderMenu(){
+  document.body.className=data.theme;
+  document.getElementById('rest-name').textContent=data.name;
+  document.getElementById('page-title').textContent=data.name;
+  document.getElementById('rest-tagline').textContent=data.tagline;
+  
+  // Tabs
+  const tabBar=document.getElementById('tab-bar');
+  tabBar.innerHTML='';
+  data.categories.forEach((cat,i)=>{
+    const b=document.createElement('button');
+    b.className='tab-btn'+(i===0?' active':'');
+    b.textContent=cat.name;
+    b.onclick=function(){
+      document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+      this.classList.add('active');
+      renderSection(cat.id);
+    };
+    tabBar.appendChild(b);
+  });
+  
+  if(data.categories.length>0) renderSection(data.categories[0].id);
+}
+
+function renderSection(catId){
+  const body=document.getElementById('menu-body');
+  body.innerHTML='';
+  const cat=data.categories.find(c=>c.id===catId);
+  if(!cat)return;
+  
+  const items=data.items.filter(i=>i.cat===catId);
+  
+  const title=document.createElement('div');
+  title.className='section-title';
+  title.textContent=cat.name;
+  body.appendChild(title);
+  
+  // Split by type
+  const thalis=items.filter(i=>i.type==='thali');
+  const cards=items.filter(i=>i.type==='card');
+  
+  thalis.forEach(item=>{
+    const el=document.createElement('div');
+    el.className='thali-card';
+    el.innerHTML=`<div class="thali-top"><div><div class="thali-name">${item.name}</div>${item.guj?`<div class="thali-sub">${item.guj}</div>`:''}</div><span class="price-badge">₹${item.price}</span></div><div class="thali-desc">${item.desc||''}</div>`;
+    body.appendChild(el);
+  });
+  
+  if(cards.length>0){
+    const grid=document.createElement('div');
+    grid.className='menu-grid';
+    cards.forEach(item=>{
+      const el=document.createElement('div');
+      el.className='menu-card';
+      el.innerHTML=`<div class="card-name">${item.name}</div>${item.guj?`<div class="card-sub">${item.guj}</div>`:''}<div class="card-desc">${item.desc||''}</div><div class="card-footer"><span class="price-badge">₹${item.price}</span></div>`;
+      grid.appendChild(el);
+    });
+    body.appendChild(grid);
+  }
+  
+  if(data.packing){
+    const note=document.createElement('div');
+    note.className='packing-note';
+    note.textContent='📦 '+data.packing;
+    body.appendChild(note);
+  }
+}
+
+// ===== LOGIN =====
+function showLogin(){
+  document.getElementById('customer-view').style.display='none';
+  const l=document.getElementById('admin-login');
+  l.style.display='flex';
+  document.getElementById('pwd-input').value='';
+  document.getElementById('login-err').style.display='none';
+}
+
+function doLogin(){
+  const v=document.getElementById('pwd-input').value;
+  if(v===data.pwd){
+    document.getElementById('admin-login').style.display='none';
+    document.getElementById('admin-panel').style.display='block';
+    loadAdminPanel();
+  } else {
+    document.getElementById('login-err').style.display='block';
+  }
+}
+
+function showCustomer(){
+  document.getElementById('admin-login').style.display='none';
+  document.getElementById('admin-panel').style.display='none';
+  document.getElementById('customer-view').style.display='block';
+  renderMenu();
+}
+
+// ===== ADMIN PANEL =====
+function loadAdminPanel(){
+  document.getElementById('inp-name').value=data.name;
+  document.getElementById('inp-tagline').value=data.tagline;
+  document.getElementById('inp-packing').value=data.packing;
+  
+  // Active theme
+  document.querySelectorAll('.theme-opt').forEach(o=>{
+    o.classList.toggle('active',o.dataset.theme===data.theme);
+  });
+  
+  renderCatList();
+  renderItemsTable();
+  populateCatSelects();
+}
+
+function renderCatList(){
+  const list=document.getElementById('cat-list');
+  list.innerHTML='';
+  data.categories.forEach(cat=>{
+    const el=document.createElement('div');
+    el.className='cat-item';
+    el.innerHTML=`<span class="cat-drag">⠿</span><span class="cat-item-name">${cat.name}</span><button class="ibtn ibtn-edit" onclick="renameCat('${cat.id}')">Rename</button><button class="ibtn ibtn-del" onclick="deleteCat('${cat.id}')">Delete</button>`;
+    list.appendChild(el);
+  });
+}
+
+function addCategory(){
+  const n=document.getElementById('new-cat-name').value.trim();
+  if(!n)return toast('Enter a category name');
+  const id='cat_'+Date.now();
+  data.categories.push({id,name:n});
+  document.getElementById('new-cat-name').value='';
+  renderCatList();
+  populateCatSelects();
+  toast('Category added');
+}
+
+function deleteCat(id){
+  if(!confirm('Delete this category? Items in it will also be removed.'))return;
+  data.categories=data.categories.filter(c=>c.id!==id);
+  data.items=data.items.filter(i=>i.cat!==id);
+  renderCatList();
+  renderItemsTable();
+  populateCatSelects();
+  toast('Category deleted');
+}
+
+function renameCat(id){
+  const cat=data.categories.find(c=>c.id===id);
+  if(!cat)return;
+  const n=prompt('Rename category:',cat.name);
+  if(n&&n.trim()){cat.name=n.trim();renderCatList();populateCatSelects();toast('Renamed');}
+}
+
+function populateCatSelects(){
+  const opts=data.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('new-item-cat').innerHTML=opts;
+  document.getElementById('filter-cat').innerHTML='<option value="all">All Categories</option>'+opts;
+}
+
+function renderItemsTable(){
+  const filter=document.getElementById('filter-cat').value;
+  const tbody=document.getElementById('items-tbody');
+  const items=filter==='all'?data.items:data.items.filter(i=>i.cat===filter);
+  document.getElementById('item-count-badge').textContent=data.items.length+' items';
+  tbody.innerHTML=items.map(item=>{
+    const cat=data.categories.find(c=>c.id===item.cat);
+    return `<tr>
+      <td><div class="item-row-name">${item.name}</div><div class="item-row-desc">${item.desc||''}</div></td>
+      <td style="font-size:.8rem;color:#888">${cat?cat.name:'-'}</td>
+      <td><span class="item-price">₹${item.price}</span></td>
+      <td><div class="item-actions"><button class="ibtn ibtn-edit" onclick="editItem(${item.id})">Edit</button><button class="ibtn ibtn-del" onclick="deleteItem(${item.id})">Del</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function addItem(){
+  const name=document.getElementById('new-item-name').value.trim();
+  const price=parseInt(document.getElementById('new-item-price').value);
+  if(!name)return toast('Enter item name');
+  if(!price||price<=0)return toast('Enter valid price');
+  const item={
+    id:Date.now(),
+    name,
+    guj:document.getElementById('new-item-guj').value.trim(),
+    desc:document.getElementById('new-item-desc').value.trim(),
+    price,
+    cat:document.getElementById('new-item-cat').value,
+    type:document.getElementById('new-item-type').value
+  };
+  data.items.push(item);
+  document.getElementById('new-item-name').value='';
+  document.getElementById('new-item-guj').value='';
+  document.getElementById('new-item-desc').value='';
+  document.getElementById('new-item-price').value='';
+  renderItemsTable();
+  toast('Item added');
+}
+
+function deleteItem(id){
+  if(!confirm('Delete this item?'))return;
+  data.items=data.items.filter(i=>i.id!==id);
+  renderItemsTable();
+  toast('Item deleted');
+}
+
+function editItem(id){
+  const item=data.items.find(i=>i.id===id);
+  if(!item)return;
+  const name=prompt('Item name:',item.name);if(name===null)return;
+  const price=prompt('Price (₹):',item.price);if(price===null)return;
+  const desc=prompt('Description:',item.desc);if(desc===null)return;
+  const guj=prompt('Gujarati name (optional):',item.guj||'');
+  item.name=name.trim()||item.name;
+  item.price=parseInt(price)||item.price;
+  item.desc=desc.trim();
+  item.guj=guj?guj.trim():'';
+  renderItemsTable();
+  toast('Item updated');
+}
+
+function pickTheme(el){
+  document.querySelectorAll('.theme-opt').forEach(o=>o.classList.remove('active'));
+  el.classList.add('active');
+  data.theme=el.dataset.theme;
+  document.body.className=data.theme;
+}
+
+function changePwd(){
+  const np=document.getElementById('new-pwd').value;
+  const cp=document.getElementById('confirm-pwd').value;
+  if(!np)return toast('Enter new password');
+  if(np!==cp)return toast('Passwords do not match');
+  if(np.length<4)return toast('Password too short');
+  data.pwd=np;
+  document.getElementById('new-pwd').value='';
+  document.getElementById('confirm-pwd').value='';
+  saveData();
+  toast('Password updated!');
+}
+
+function saveAll(){
+  data.name=document.getElementById('inp-name').value.trim()||data.name;
+  data.tagline=document.getElementById('inp-tagline').value.trim()||data.tagline;
+  data.packing=document.getElementById('inp-packing').value.trim();
+  saveData();
+  toast('Saved & Published!');
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+// ===== INIT =====
+loadData();
+renderMenu();
+</script>
+</body>
+</html>
