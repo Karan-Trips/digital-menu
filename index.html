@@ -256,6 +256,15 @@ Powered by Karan Smart Menu
       
   </div>
   <div class="tab-bar" id="tab-bar"></div>
+  <!-- Add sorting dropdown here -->
+<div style="padding:10px 14px; display:flex; gap:10px; align-items:center;">
+  <label for="cust-sort-price" style="font-size:.85rem; color:var(--text-muted)">Sort by Price:</label>
+  <select id="cust-sort-price" onchange="renderMenuByPrice()">
+    <option value="none">Default</option>
+    <option value="asc">Low → High</option>
+    <option value="desc">High → Low</option>
+  </select>
+</div>
   <div class="menu-body" id="menu-body"></div>
   <button class="admin-trigger" onclick="showLogin()">⚙ Admin</button>
 </div>
@@ -353,7 +362,22 @@ Powered by Karan Smart Menu
         </div>
       </div>
     </div>
-
+    <div class="form-row" style="margin-bottom:12px">
+      <div class="form-group">
+        <label>Filter by category</label>
+        <select id="filter-cat" onchange="renderItemsTable()">
+          <option value="all">All Categories</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Sort by Price</label>
+        <select id="sort-price" onchange="renderItemsTable()">
+          <option value="none">Default</option>
+          <option value="asc">Low → High</option>
+          <option value="desc">High → Low</option>
+        </select>
+      </div>
+    </div>
     <!-- Categories -->
     <div class="admin-section">
       <h3>Menu Categories (Tabs)</h3>
@@ -384,8 +408,9 @@ Powered by Karan Smart Menu
         <thead>
           <tr>
             <th>Item</th>
-            <th>Category</th>
-            <th>Price</th>
+            <th style="cursor:pointer" onclick="togglePriceSort()">
+              Price <span id="price-sort-arrow">⬍</span>
+            </th>
             <th style="text-align:right">Actions</th>
           </tr>
         </thead>
@@ -645,7 +670,7 @@ function addCategory(){
   const n=document.getElementById('new-cat-name').value.trim();
   if(!n)return toast('Enter a category name');
   const id='cat_'+Date.now();
-  data.categories.push({id,name:n});
+  data.categories.push({id: id, name: n});
   document.getElementById('new-cat-name').value='';
   renderCatList();
   populateCatSelects();
@@ -676,41 +701,57 @@ function populateCatSelects(){
 }
 
 function renderItemsTable(){
-  const filter=document.getElementById('filter-cat').value;
-  const tbody=document.getElementById('items-tbody');
-  const items=filter==='all'?data.items:data.items.filter(i=>i.cat===filter);
-  document.getElementById('item-count-badge').textContent=data.items.length+' items';
-  tbody.innerHTML=items.map(item=>{
-    const cat=data.categories.find(c=>c.id===item.cat);
+  const filter = document.getElementById('filter-cat').value;
+
+  const sort = priceSort || document.getElementById('sort-price').value;
+  let items = filter === 'all' ? data.items.slice() : data.items.filter(i => i.cat === filter);
+
+  // Sort by price if needed
+  if(sort === 'asc'){
+    items.sort((a,b) => a.price - b.price);
+  } else if(sort === 'desc'){
+    items.sort((a,b) => b.price - a.price);
+  }
+
+  document.getElementById('item-count-badge').textContent = data.items.length + ' items';
+  const tbody = document.getElementById('items-tbody');
+  tbody.innerHTML = items.map(item => {
+    const cat = data.categories.find(c => c.id === item.cat);
     return `<tr>
       <td><div class="item-row-name">${item.name}</div><div class="item-row-desc">${item.desc||''}</div></td>
       <td style="font-size:.8rem;color:#888">${cat?cat.name:'-'}</td>
       <td><span class="item-price">₹${item.price}</span></td>
-      <td><div class="item-actions"><button class="ibtn ibtn-edit" onclick="editItem(${item.id})">Edit</button><button class="ibtn ibtn-del" onclick="deleteItem(${item.id})">Del</button></div></td>
+      <td>
+        <div class="item-actions">
+          <button class="ibtn ibtn-edit" onclick="editItem(${item.id})">Edit</button>
+          <button class="ibtn ibtn-del" onclick="deleteItem(${item.id})">Del</button>
+        </div>
+      </td>
     </tr>`;
   }).join('');
 }
 
-function addItem(){
-  const name=document.getElementById('new-item-name').value.trim();
-  const price=parseInt(document.getElementById('new-item-price').value);
-  if(!name)return toast('Enter item name');
-  if(!price||price<=0)return toast('Enter valid price');
-  const item={
-    id:Date.now(),
-    name,
-    guj:document.getElementById('new-item-guj').value.trim(),
-    desc:document.getElementById('new-item-desc').value.trim(),
-    price,
-    cat:document.getElementById('new-item-cat').value,
-    type:document.getElementById('new-item-type').value
-  };
-  data.items.push(item);
-  document.getElementById('new-item-name').value='';
-  document.getElementById('new-item-guj').value='';
-  document.getElementById('new-item-desc').value='';
-  document.getElementById('new-item-price').value='';
+function addItem() {
+  const name = document.getElementById('new-item-name').value.trim();
+  const guj = document.getElementById('new-item-guj').value.trim();
+  const desc = document.getElementById('new-item-desc').value.trim();
+  const price = parseInt(document.getElementById('new-item-price').value);
+  const cat = document.getElementById('new-item-cat').value;
+  const type = document.getElementById('new-item-type').value;
+
+  if (!name || isNaN(price) || !cat) return toast('Please fill all required fields');
+
+  const id = Date.now();
+  data.items.push({ id, name, guj, desc, price, cat, type });
+
+  // Clear form
+  document.getElementById('new-item-name').value = '';
+  document.getElementById('new-item-guj').value = '';
+  document.getElementById('new-item-desc').value = '';
+  document.getElementById('new-item-price').value = '';
+
   renderItemsTable();
+  renderMenu();
   toast('Item added');
 }
 
@@ -774,6 +815,81 @@ function saveAll(){
   data.packing=document.getElementById('inp-packing').value.trim();
   saveData();
   toast('Saved & Published!');
+}
+let priceSort = 'none'; // current sort state
+
+function togglePriceSort() {
+  if (priceSort === 'none' || priceSort === 'desc') {
+    priceSort = 'asc';
+    document.getElementById('price-sort-arrow').textContent = '⬆';
+  } else {
+    priceSort = 'desc';
+    document.getElementById('price-sort-arrow').textContent = '⬇';
+  }
+  document.getElementById('sort-price').value = priceSort; // sync dropdown
+  renderItemsTable();
+}
+function renderMenuByPrice() {
+  const sort = document.getElementById('cust-sort-price').value;
+  
+  // Find the currently active category
+  const activeTab = document.querySelector('.tab-btn.active');
+  if (!activeTab) return;
+  const catId = data.categories.find(c => c.name === activeTab.textContent)?.id;
+  if (!catId) return;
+
+  // Filter items in that category
+  let items = data.items.filter(i => i.cat === catId);
+
+  // Sort if needed
+  if (sort === 'asc') items.sort((a,b) => a.price - b.price);
+  else if (sort === 'desc') items.sort((a,b) => b.price - a.price);
+
+  // Render items (reuse existing renderSection logic)
+  const body = document.getElementById('menu-body');
+  body.innerHTML = '';
+  const cat = data.categories.find(c => c.id === catId);
+  const title = document.createElement('div');
+  title.className = 'section-title';
+  title.textContent = cat.name;
+  body.appendChild(title);
+
+  const thalis = items.filter(i=>i.type==='thali');
+  const cards = items.filter(i=>i.type==='card');
+
+  thalis.forEach(item=>{
+    const el = document.createElement('div');
+    el.className='thali-card';
+    el.innerHTML=`<div class="thali-top"><div><div class="thali-name">${item.name}</div>${item.guj?`<div class="thali-sub">${item.guj}</div>`:''}</div><span class="price-badge">₹${item.price}</span></div><div class="thali-desc">${item.desc||''}</div>`;
+    body.appendChild(el);
+  });
+
+  if(cards.length>0){
+    const grid = document.createElement('div');
+    grid.className='menu-grid';
+    cards.forEach(item=>{
+      const el = document.createElement('div');
+      el.className='menu-card';
+      el.innerHTML=`<div class="card-name">${item.name}</div>${item.guj?`<div class="card-sub">${item.guj}</div>`:''}<div class="card-desc">${item.desc||''}</div><div class="card-footer"><span class="price-badge">₹${item.price}</span></div>`;
+      grid.appendChild(el);
+    });
+    body.appendChild(grid);
+  }
+
+  if(data.packing){
+    const note=document.createElement('div');
+    note.className='packing-note';
+    note.textContent='📦 '+data.packing;
+    body.appendChild(note);
+  }
+
+  const foot=document.createElement('div');
+  foot.style.textAlign='center';
+  foot.style.fontSize='12px';
+  foot.style.marginTop='15px';
+  foot.style.opacity='0.7';
+  foot.textContent='Digital Menu by Karan Smart Menu';
+  body.appendChild(foot);
 }
 
 function toast(msg){
