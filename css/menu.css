@@ -94,14 +94,33 @@ body.theme-minimal .menu-header p{color:#666}
 .tag-veg::after{content:'';width:8px;height:8px;background:#4caf50;border-radius:50%}
 .tag-nonveg::after{content:'';width:8px;height:8px;background:#f44336;border-radius:50%}
 
-.out-of-stock{
-  position:relative;opacity:.6;filter:grayscale(0.8);pointer-events:none;
+/* ===== ADMIN TRIGGER (RE-DESIGNED Phase 5) ===== */
+.admin-trigger{
+  position:fixed;bottom:25px;left:20px;
+  width:45px;height:45px;background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(10px);border:1.5px solid rgba(0,0,0,0.05);
+  border-radius:15px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:200;
+  transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  text-decoration:none;font-size:1.3rem;color:var(--text);
+  border: 1px solid rgba(0,0,0,0.1);
 }
-.out-of-stock-label{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-10deg);
-  background:rgba(0,0,0,.7);color:#fff;padding:4px 12px;
-  border-radius:4px;font-weight:800;font-size:.8rem;z-index:5;
-  text-transform:uppercase;letter-spacing:1px;
+.admin-trigger:hover{
+  transform:scale(1.15) rotate(15deg);
+  background:var(--primary);color:#fff;
+  box-shadow:0 12px 40px rgba(200,75,47,0.3);
+  border-color:transparent;
+}
+
+/* ===== OUT OF STOCK (Phase 5 Polish) ===== */
+.out-of-stock{opacity:0.75;filter:grayscale(0.5)}
+.out-of-stock-label {
+  position: absolute; top: 15px; left: 15px;
+  background: rgba(0,0,0,0.85); color: #fff;
+  padding: 4px 10px; border-radius: 6px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px; z-index: 5;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* ===== ADD TO CART CONTROLS ===== */
@@ -125,37 +144,45 @@ body.theme-minimal .menu-header p{color:#666}
 }
 .qty-val{font-weight:800;font-size:.9rem;min-width:14px;text-align:center}
 
-/* ===== BADGES & RIBBONS (Phase 3) ===== */
-.item-badges{
-  position:absolute;top:10px;right:-5px;
-  display:flex;flex-direction:column;align-items:flex-end;gap:5px;
-  z-index:10;pointer-events:none;
+/* ===== FEATURED SECTION (Phase 4) ===== */
+.featured-section{
+  padding:15px 14px 25px;background:var(--card);
+  border-bottom:1px solid var(--card-border);
+  overflow:hidden;margin-bottom:10px;
 }
-.badge-tag{
-  padding:4px 10px;font-size:.65rem;font-weight:900;
-  text-transform:uppercase;border-radius:4px 0 0 4px;
-  box-shadow:-2px 2px 5px rgba(0,0,0,.15);
-  animation:badgeSlideIn .4s ease-out backwards;
+.featured-header{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;
 }
-@keyframes badgeSlideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.featured-header h2{font-size:1.1rem;font-weight:900;color:var(--primary);letter-spacing:1px}
+.featured-scroll{
+  display:flex;gap:15px;overflow-x:auto;padding:5px 5px 15px;
+  scrollbar-width:none; /* Hide scrollbar Firefox */
+}
+.featured-scroll::-webkit-scrollbar{display:none} /* Hide scrollbar Chrome */
 
-.tag-popular{background:#FFD700;color:#000} /* Gold */
-.tag-most-ordered{background:#2196F3;color:#fff} /* Blue */
+.featured-item{
+  min-width:240px;background:var(--bg);border-radius:18px;
+  padding:15px;border:1.5px solid var(--card-border);
+  box-shadow:0 8px 20px rgba(0,0,0,.08);position:relative;
+  transition:transform .3s;cursor:pointer;
+}
+.featured-item:active{transform:scale(0.97)}
+.featured-badge{
+  position:absolute;top:10px;right:10px;background:var(--accent);
+  color:#fff;font-size:9px;font-weight:900;padding:3px 8px;border-radius:50px;
+}
 
-.offer-ribbon {
-  position: absolute;top: -6px;left: -6px;
-  width: 80px;height: 80px;overflow: hidden;z-index: 15;
-  pointer-events: none;
-}
-.offer-ribbon span {
-  position: absolute;display: block;width: 120px;
-  padding: 4px 0;background: #e91e63;
-  box-shadow: 0 5px 10px rgba(0,0,0,.1);
-  color: #fff;font: 800 10px/1 'Nunito', sans-serif;
-  text-shadow: 0 1px 1px rgba(0,0,0,.2);
-  text-transform: uppercase;text-align: center;
-  right: -10px;top: 18px;transform: rotate(-45deg);
-}
+/* ===== SPICE LEVELS ===== */
+.spice-wrap{display:flex;gap:2px;margin-top:4px}
+.spice-icon{font-size:11px;filter:grayscale(1);opacity:.3}
+.spice-icon.active{filter:grayscale(0);opacity:1}
+
+/* ===== BADGES & RIBBONS (Phase 3+) ===== */
+/* ... existing ribbon styles ... */
+.tag-chef-special{background:#ff5722;color:#fff}
+
+/* Adjust Section Title to include Icon */
+.section-title i{font-style:normal;margin-right:10px;font-size:1.6rem}
 
 /* ===== MENU BODY ===== */
 .menu-body{padding:18px 14px 80px;max-width:540px;margin:0 auto}

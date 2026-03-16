@@ -1,6 +1,6 @@
-// ===== MENU PAGE LOGIC (Phase 2) =====
+// ===== MENU PAGE LOGIC (Phase 4 - Boutique) =====
 
-let activeCatId = null;
+let activeCatId = 'all';
 let priceSort = 'none';
 let searchQuery = '';
 let vegOnly = false;
@@ -14,12 +14,30 @@ function renderMenu() {
   // Render search & filter if not present
   renderSearchFilter();
 
+  // Render Featured Section
+  renderFeatured();
+
   const tabBar = document.getElementById('tab-bar');
   tabBar.innerHTML = '';
-  data.categories.forEach((cat, i) => {
+  // Only show visible categories
+  const visibleCats = data.categories.filter(c => c.visible !== false);
+
+  // Add "All" tab first
+  const allBtn = document.createElement('button');
+  allBtn.className = 'tab-btn' + (activeCatId === 'all' ? ' active' : '');
+  allBtn.innerHTML = '🍽️ All';
+  allBtn.onclick = function() {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeCatId = 'all';
+    renderSection();
+  };
+  tabBar.appendChild(allBtn);
+
+  visibleCats.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
-    btn.textContent = cat.name;
+    btn.className = 'tab-btn' + (activeCatId === cat.id ? ' active' : '');
+    btn.innerHTML = `${cat.icon || ''} ${cat.name}`;
     btn.onclick = function() {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
@@ -29,15 +47,47 @@ function renderMenu() {
     tabBar.appendChild(btn);
   });
 
-  if (data.categories.length > 0) {
-    activeCatId = data.categories[0].id;
-    renderSection();
+  renderSection();
+}
+
+function renderFeatured() {
+  const featuredItems = data.items.filter(i => i.featured && i.available);
+  const container = document.getElementById('featured-container');
+  if (!container) return;
+
+  if (featuredItems.length === 0) {
+    container.style.display = 'none';
+    return;
   }
+
+  container.style.display = 'block';
+  container.className = 'featured-section';
+  container.innerHTML = `
+    <div class="featured-header">
+      <h2>CHEF'S SPECIALS</h2>
+      <span style="font-size:12px;opacity:.5">Scroll →</span>
+    </div>
+    <div class="featured-scroll">
+      ${featuredItems.map(item => `
+        <div class="featured-item" onclick="addToCart(${item.id})">
+          <div class="featured-badge">MUST TRY</div>
+          <div style="font-weight:900;font-size:.95rem;margin-bottom:4px">${item.name}</div>
+          <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:8px;line-height:1.3">${item.desc ? item.desc.substring(0, 45) + '...' : ''}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:900;color:var(--primary)">₹${item.price}</span>
+            <span style="background:rgba(0,0,0,.05);padding:4px 8px;border-radius:6px;font-size:10px;font-weight:800">+ ADD</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 function renderSearchFilter() {
   const container = document.getElementById('search-filter-container');
   if (!container) return;
+  if (container.innerHTML) return; // Already rendered
+
   container.className = 'search-filter-wrap';
   container.innerHTML = `
     <div class="search-box">
@@ -79,44 +129,53 @@ function renderSection() {
   const body = document.getElementById('menu-body');
   body.innerHTML = '';
 
-  const cat = data.categories.find(c => c.id === activeCatId);
-  if (!cat) return;
+  const visibleCats = data.categories.filter(c => c.visible !== false);
 
-  // Title (only show if not searching across categories - keeping it simple for now)
-  const title = document.createElement('div');
-  title.className = 'section-title';
-  title.textContent = cat.name;
-  body.appendChild(title);
+  // If showing all categories
+  const catsToRender = activeCatId === 'all' ? visibleCats : visibleCats.filter(c => c.id === activeCatId);
 
-  // Filter items
-  let items = data.items.filter(i => {
-    const matchesCat = i.cat === activeCatId;
-    const matchesSearch = i.name.toLowerCase().includes(searchQuery) || (i.guj && i.guj.includes(searchQuery));
-    const matchesVeg = vegOnly ? i.isVeg : true;
-    return matchesCat && matchesSearch && matchesVeg;
+  if (catsToRender.length === 0) return;
+
+  catsToRender.forEach(cat => {
+    let items = data.items.filter(i => {
+      const matchesCat = i.cat === cat.id;
+      const matchesSearch = i.name.toLowerCase().includes(searchQuery) || (i.guj && i.guj.includes(searchQuery));
+      const matchesVeg = vegOnly ? i.isVeg : true;
+      return matchesCat && matchesSearch && matchesVeg;
+    });
+
+    if (priceSort === 'asc') items.sort((a,b) => a.price - b.price);
+    if (priceSort === 'desc') items.sort((a,b) => b.price - a.price);
+
+    if (items.length === 0) return; // Skip empty categories
+
+    const title = document.createElement('div');
+    title.className = 'section-title';
+    title.innerHTML = `<i>${cat.icon || '🍽️'}</i> ${cat.name}`;
+    body.appendChild(title);
+
+    const thalis = items.filter(i => i.type === 'thali');
+    const cards = items.filter(i => i.type === 'card');
+
+    thalis.forEach(item => body.appendChild(createItemEl(item, 'thali')));
+    if (cards.length > 0) {
+      const grid = document.createElement('div');
+      grid.className = 'menu-grid';
+      cards.forEach(item => grid.appendChild(createItemEl(item, 'card')));
+      body.appendChild(grid);
+    }
   });
 
-  // Sort items
-  if (priceSort === 'asc') items.sort((a,b) => a.price - b.price);
-  if (priceSort === 'desc') items.sort((a,b) => b.price - a.price);
-
-  if (items.length === 0) {
-    body.innerHTML += `<div class="empty-state"><div class="empty-icon">🔍</div><p>No items found.</p></div>`;
+  if (body.innerHTML === '') {
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.style.textAlign = 'center';
+    empty.style.padding = '40px 0';
+    empty.innerHTML = `<div style="font-size:30px;margin-bottom:10px">🔍</div><p style="color:#888">No items found.</p>`;
+    body.appendChild(empty);
     return;
   }
 
-  const thalis = items.filter(i => i.type === 'thali');
-  const cards = items.filter(i => i.type === 'card');
-
-  thalis.forEach(item => body.appendChild(createItemEl(item, 'thali')));
-  if (cards.length > 0) {
-    const grid = document.createElement('div');
-    grid.className = 'menu-grid';
-    cards.forEach(item => grid.appendChild(createItemEl(item, 'card')));
-    body.appendChild(grid);
-  }
-
-  // Footer / Packing
   if (data.packing) {
     const note = document.createElement('div');
     note.className = 'packing-note';
@@ -133,9 +192,18 @@ function createItemEl(item, type) {
   const cartItem = cart.find(c => c.id === item.id);
   const qty = cartItem ? cartItem.qty : 0;
 
+  // Spice level rendering
+  let spices = '';
+  if (item.spiceLevel > 0) {
+    spices = '<div class="spice-wrap">';
+    for(let s=1; s<=3; s++) {
+      spices += `<span class="spice-icon ${s <= item.spiceLevel ? 'active' : ''}">🌶️</span>`;
+    }
+    spices += '</div>';
+  }
+
   const innerHTML = `
     ${!item.available ? '<div class="out-of-stock-label">Out of Stock</div>' : ''}
-    
     ${item.offer ? `<div class="offer-ribbon"><span>${item.offer}</span></div>` : ''}
     
     <div class="item-badges">
@@ -148,9 +216,10 @@ function createItemEl(item, type) {
     </div>
     ${type === 'thali' ? `
       <div class="thali-top">
-        <div>
+        <div style="flex:1">
           <div class="thali-name" style="${item.offer ? 'margin-left:15px' : ''}">${item.name}</div>
           ${item.guj ? `<div class="thali-sub" style="${item.offer ? 'margin-left:15px' : ''}">${item.guj}</div>` : ''}
+          ${spices}
         </div>
         <span class="price-badge">₹${item.price}</span>
       </div>
@@ -159,6 +228,7 @@ function createItemEl(item, type) {
       <div class="card-name" style="${item.offer ? 'margin-top:10px' : ''}">${item.name}</div>
       ${item.guj ? `<div class="card-sub">${item.guj}</div>` : ''}
       <div class="card-desc">${item.desc || ''}</div>
+      ${spices}
       <div class="card-footer"><span class="price-badge">₹${item.price}</span></div>
     `}
     <div class="cart-controls">
@@ -177,12 +247,9 @@ function createItemEl(item, type) {
   return el;
 }
 
-// Override updateCartUI from cart.js to trigger re-render of item cards
-// This is a bit brute-force but ensures the ADD/QTY state stays synced
 const originalUpdateCartUI = updateCartUI;
 window.updateCartUI = function() {
   originalUpdateCartUI();
-  // Only re-render if the menu is already loaded
   if (activeCatId) renderSection();
 };
 

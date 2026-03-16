@@ -87,9 +87,10 @@
       <div class="admin-section">
         <h3>Categories</h3>
         <div class="cat-list" id="cat-list"></div>
-        <div class="form-row">
-          <input type="text" id="new-cat-name" placeholder="New category name" style="flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#111;color:#fff">
-          <button class="abtn abtn-primary" onclick="addCategory()">+ Add</button>
+        <div class="form-row" style="margin-top:20px;gap:10px">
+          <input type="text" id="new-cat-icon" placeholder="🍔" style="width:50px;text-align:center">
+          <input type="text" id="new-cat-name" placeholder="New category name" style="flex:1">
+          <button class="abtn abtn-primary" onclick="addCategory()">+ Add Category</button>
         </div>
       </div>
     </div>
@@ -98,13 +99,9 @@
     <div class="admin-tab-content" id="tab-items">
       <div class="admin-section">
         <h3>Items <span class="badge" id="item-count-badge">0</span></h3>
-        <div class="form-row" style="margin-bottom:12px">
-          <select id="filter-cat" onchange="renderItemsTable()" style="background:#111;color:#fff;border:1px solid #333;padding:8px;border-radius:8px;flex:1"></select>
-          <button class="abtn abtn-ghost" onclick="togglePriceSort()">Price <span id="price-sort-arrow">⬍</span></button>
-        </div>
-        <div class="table-wrap"><table class="items-table"><thead><tr><th>Item</th><th>Cat</th><th>Price</th><th>Actions</th></tr></thead><tbody id="items-tbody"></tbody></table></div>
         
-        <div class="add-item-form">
+        <!-- Add Item Form moved to Top -->
+        <div class="add-item-form" style="margin-bottom: 30px; border-bottom: 1px solid var(--card-border); padding-bottom: 30px;">
           <h4>+ New Item</h4>
           <div class="form-row">
             <input type="text" id="new-item-name" placeholder="Name" style="flex:2">
@@ -123,16 +120,31 @@
               <option value="card">Card</option>
               <option value="thali">Thali</option>
             </select>
+            <select id="new-item-spice" style="flex:1">
+              <option value="0">Not Spicy (0)</option>
+              <option value="1">Mild (🌶️)</option>
+              <option value="2">Medium (🌶️🌶️)</option>
+              <option value="3">Spicy (🌶️🌶️🌶️)</option>
+            </select>
+          </div>
+          <div class="form-row" style="flex-wrap:wrap">
             <div style="display:flex;gap:10px;align-items:center;flex:1">
-              <label style="display:flex;align-items:center;gap:4px;font-size:.75rem;color:#888"><input type="checkbox" id="new-item-veg" checked> Veg</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:.75rem;color:#888"><input type="checkbox" id="new-item-pop"> Popular</label>
-              <label style="display:flex;align-items:center;gap:4px;font-size:.75rem;color:#888"><input type="checkbox" id="new-item-most"> Most Ordered</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:#888"><input type="checkbox" id="new-item-veg" checked> Veg</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:#888"><input type="checkbox" id="new-item-pop"> Popular</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:#888"><input type="checkbox" id="new-item-most"> Most Ordered</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:.7rem;color:#888"><input type="checkbox" id="new-item-feat"> Featured</label>
             </div>
           </div>
           <div class="form-row">
             <button class="abtn abtn-primary" style="width:100%" onclick="addItem()">+ Add Item</button>
           </div>
         </div>
+
+        <div class="form-row" style="margin-bottom:12px">
+          <select id="filter-cat" onchange="renderItemsTable()" style="background:#111;color:#fff;border:1px solid #333;padding:8px;border-radius:8px;flex:1"></select>
+          <button class="abtn abtn-ghost" onclick="togglePriceSort()">Price <span id="price-sort-arrow">⬍</span></button>
+        </div>
+        <div class="table-wrap"><table class="items-table"><thead><tr><th>Item</th><th>Cat</th><th>Price</th><th>Actions</th></tr></thead><tbody id="items-tbody"></tbody></table></div>
       </div>
     </div>
 
@@ -154,12 +166,21 @@
     <div class="form-row"><input type="text" id="edit-item-name" placeholder="Name"><input type="text" id="edit-item-guj" placeholder="Gujarati"></div>
     <div class="form-row"><input type="text" id="edit-item-desc" placeholder="Desc" style="flex:3"><input type="number" id="edit-item-price" placeholder="Price"></div>
     <div class="form-row"><input type="text" id="edit-item-offer" placeholder="Offer text" style="flex:1"><select id="edit-item-cat" style="flex:1"></select></div>
-    <div class="form-row"><select id="edit-item-type"><option value="card">Card</option><option value="thali">Thali</option></select></div>
-    <div class="form-row" style="flex-wrap:wrap;gap:15px">
-      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-veg"> Veg</label>
-      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-avail"> Available</label>
-      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-pop"> Popular</label>
-      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-most"> Most Ordered</label>
+    <div class="form-row">
+      <select id="edit-item-type" style="flex:1"><option value="card">Card</option><option value="thali">Thali</option></select>
+      <select id="edit-item-spice" style="flex:1">
+        <option value="0">No Spice</option>
+        <option value="1">Mild 🌶️</option>
+        <option value="2">Medium 🌶️🌶️</option>
+        <option value="3">Spicy 🌶️🌶️🌶️</option>
+      </select>
+    </div>
+    <div class="form-row" style="flex-wrap:wrap;gap:12px">
+      <label style="color:#888;font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="edit-item-veg"> Veg</label>
+      <label style="color:#888;font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="edit-item-avail"> Available</label>
+      <label style="color:#888;font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="edit-item-pop"> Popular</label>
+      <label style="color:#888;font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="edit-item-most"> Most Ordered</label>
+      <label style="color:#888;font-size:11px;display:flex;align-items:center;gap:4px"><input type="checkbox" id="edit-item-feat"> Featured</label>
     </div>
     <div class="modal-actions"><button class="abtn abtn-ghost" onclick="closeEditModal()">Close</button><button class="abtn abtn-primary" onclick="saveEditModal()">Save Changes</button></div>
   </div>

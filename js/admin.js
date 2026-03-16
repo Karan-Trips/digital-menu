@@ -57,10 +57,11 @@ function renderCatList() {
   data.categories.forEach(cat => {
     const el = document.createElement('div');
     el.className = 'cat-item';
+    el.style.display = 'flex'; el.style.alignItems = 'center'; el.style.gap = '10px';
     el.innerHTML = `
-      <span class="cat-drag">⠿</span>
-      <span class="cat-item-name">${cat.name}</span>
-      <button class="ibtn ibtn-edit" onclick="renameCat('${cat.id}')">Rename</button>
+      <span style="font-size:1.4rem">${cat.icon || '🍽️'}</span>
+      <span class="cat-item-name" style="flex:1;font-weight:700">${cat.name} ${cat.visible === false ? ' <span style="font-size:10px;color:#888">(Hidden)</span>' : ''}</span>
+      <button class="ibtn ibtn-edit" onclick="editCat('${cat.id}')">Edit</button>
       <button class="ibtn ibtn-del"  onclick="deleteCat('${cat.id}')">Delete</button>
     `;
     list.appendChild(el);
@@ -69,29 +70,32 @@ function renderCatList() {
 
 function addCategory() {
   const n = document.getElementById('new-cat-name').value.trim();
+  const i = document.getElementById('new-cat-icon').value.trim() || '🍽️';
   if (!n) return toast('Enter a category name');
   const id = 'cat_' + Date.now();
-  data.categories.push({ id, name: n });
+  data.categories.push({ id, name: n, icon: i, visible: true });
   document.getElementById('new-cat-name').value = '';
+  document.getElementById('new-cat-icon').value = '';
   renderCatList();
   populateCatSelects();
   toast('Category added ✔');
 }
 
-function deleteCat(id) {
-  if (!confirm('Delete this category? Items in it will be removed too.')) return;
-  data.categories = data.categories.filter(c => c.id !== id);
-  data.items      = data.items.filter(i => i.cat !== id);
-  renderCatList();
-  renderItemsTable();
-  populateCatSelects();
-}
-
-function renameCat(id) {
+function editCat(id) {
   const cat = data.categories.find(c => c.id === id);
   if (!cat) return;
   const n = prompt('Rename category:', cat.name);
-  if (n && n.trim()) { cat.name = n.trim(); renderCatList(); populateCatSelects(); toast('Renamed ✔'); }
+  if (n === null) return;
+  const i = prompt('Category Icon (emoji):', cat.icon || '🍽️');
+  const v = confirm('Show this category in menu?');
+  
+  if (n.trim()) cat.name = n.trim();
+  cat.icon = i || '🍽️';
+  cat.visible = v;
+  
+  renderCatList();
+  populateCatSelects();
+  toast('Category updated ✔');
 }
 
 function populateCatSelects() {
@@ -123,20 +127,30 @@ function renderItemsTable() {
         </div>
         <div class="item-row-desc">${item.desc || ''}</div>
       </td>
-      <td style="font-size:.8rem;color:#888">${cat ? cat.name : '-'}</td>
+      <td style="font-size:.8rem;color:#888">
+        ${cat ? cat.name : '-'}
+        <div style="margin-top:5px">
+          <span class="stock-badge ${item.available ? 'stock-in' : 'stock-out'}">
+            ${item.available ? '● IN STOCK' : '○ SOLD OUT'}
+          </span>
+        </div>
+      </td>
       <td>
         <span class="item-price">₹${item.price}</span>
         ${item.offer ? `<div style="font-size:10px;color:#e91e63;font-weight:800;margin-top:2px">🔥 ${item.offer}</div>` : ''}
       </td>
       <td>
         <div class="item-actions">
-          <div style="display:flex;gap:4px;margin-bottom:4px">
+          <div style="display:flex;gap:4px;margin-bottom:6px;justify-content:flex-end">
             ${item.popular ? '<span style="background:#FFD700;color:#000;font-size:9px;padding:1px 4px;border-radius:3px;font-weight:800">POP</span>' : ''}
             ${item.mostOrdered ? '<span style="background:#2196F3;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px;font-weight:800">MOST</span>' : ''}
+            ${item.featured ? '<span style="background:#ff5722;color:#fff;font-size:9px;padding:1px 4px;border-radius:3px;font-weight:800">FEAT</span>' : ''}
           </div>
-          <button class="ibtn ${item.available?'ibtn-edit':'ibtn-ghost'}" onclick="toggleAvailability(${item.id})">${item.available?'In Stock':'Sold Out'}</button>
-          <button class="ibtn ibtn-edit" onclick="openEditModal(${item.id})">Edit</button>
-          <button class="ibtn ibtn-del"  onclick="deleteItem(${item.id})">Del</button>
+          <div style="display:flex;gap:5px;justify-content:flex-end">
+            <button class="ibtn ibtn-stock" onclick="toggleAvailability(${item.id})">Stock</button>
+            <button class="ibtn ibtn-edit" onclick="openEditModal(${item.id})">Edit</button>
+            <button class="ibtn ibtn-del"  onclick="deleteItem(${item.id})">Del</button>
+          </div>
         </div>
       </td>
     </tr>`;
@@ -169,15 +183,19 @@ function addItem() {
   const offer = document.getElementById('new-item-offer').value.trim();
   const pop   = document.getElementById('new-item-pop').checked;
   const most  = document.getElementById('new-item-most').checked;
+  const feat  = document.getElementById('new-item-feat').checked;
+  const spice = parseInt(document.getElementById('new-item-spice').value);
 
   if (!name || isNaN(price) || !cat) return toast('Fill in name, price & category');
 
-  data.items.push({ id: Date.now(), name, guj, desc, price, cat, type, isVeg, available: true, offer, popular: pop, mostOrdered: most });
+  data.items.push({ id: Date.now(), name, guj, desc, price, cat, type, isVeg, available: true, offer, popular: pop, mostOrdered: most, featured: feat, spiceLevel: spice });
 
   ['new-item-name','new-item-guj','new-item-desc','new-item-price','new-item-offer'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('new-item-veg').checked = true;
   document.getElementById('new-item-pop').checked = false;
   document.getElementById('new-item-most').checked = false;
+  document.getElementById('new-item-feat').checked = false;
+  document.getElementById('new-item-spice').value = "0";
 
   renderItemsTable();
   toast('Item added ✔');
@@ -206,6 +224,8 @@ function openEditModal(id) {
   document.getElementById('edit-item-offer').value = item.offer || '';
   document.getElementById('edit-item-pop').checked = item.popular || false;
   document.getElementById('edit-item-most').checked = item.mostOrdered || false;
+  document.getElementById('edit-item-feat').checked = item.featured || false;
+  document.getElementById('edit-item-spice').value = item.spiceLevel || 0;
 
   const catOpts = data.categories.map(c => `<option value="${c.id}" ${c.id === item.cat ? 'selected' : ''}>${c.name}</option>`).join('');
   document.getElementById('edit-item-cat').innerHTML = catOpts;
@@ -236,6 +256,8 @@ function saveEditModal() {
   item.offer = document.getElementById('edit-item-offer').value.trim();
   item.popular = document.getElementById('edit-item-pop').checked;
   item.mostOrdered = document.getElementById('edit-item-most').checked;
+  item.featured = document.getElementById('edit-item-feat').checked;
+  item.spiceLevel = parseInt(document.getElementById('edit-item-spice').value);
 
   closeEditModal();
   renderItemsTable();
