@@ -1,0 +1,61 @@
+/* ===== GOOGLE FONTS loaded in HTML ===== */
+
+/* ===== BASE RESET ===== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Nunito',sans-serif;min-height:100vh;background:#FDF6EE;color:#2C1A0E}
+
+/* ===== THEMES ===== */
+body.theme-classic{
+  --bg:#FDF6EE;--primary:#C84B2F;--primary-dark:#9C3520;--accent:#D4960A;
+  --card:#fff;--card-border:#F0D5CC;--text:#2C1A0E;--text-muted:#6B4226;
+  --tab-bg:#9C3520;--badge-bg:#C84B2F;--header-bg:#C84B2F;
+}
+body.theme-dark{
+  --bg:#111;--primary:#D4AF37;--primary-dark:#B8960A;--accent:#FF6B35;
+  --card:#1e1e1e;--card-border:#333;--text:#eee;--text-muted:#888;
+  --tab-bg:#0a0a0a;--badge-bg:#D4AF37;--header-bg:#0a0a0a;
+}
+body.theme-minimal{
+  --bg:#f8f8f8;--primary:#111;--primary-dark:#333;--accent:#111;
+  --card:#fff;--card-border:#e0e0e0;--text:#111;--text-muted:#666;
+  --tab-bg:#111;--badge-bg:#111;--header-bg:#fff;
+}
+body.theme-green{
+  --bg:#F1F8F1;--primary:#2E7D32;--primary-dark:#1B5E20;--accent:#558B2F;
+  --card:#fff;--card-border:#C8E6C9;--text:#1B2E1B;--text-muted:#4a6a4a;
+  --tab-bg:#1B5E20;--badge-bg:#2E7D32;--header-bg:#2E7D32;
+}
+body.theme-street{
+  --bg:#111;--primary:#FF5722;--primary-dark:#BF360C;--accent:#FFC107;
+  --card:#1e1e1e;--card-border:#2a2a2a;--text:#fff;--text-muted:#aaa;
+  --tab-bg:#0a0a0a;--badge-bg:#FF5722;--header-bg:#FF5722;
+}
+body.theme-pastel{
+  --bg:#FFF5F7;--primary:#C2185B;--primary-dark:#880E4F;--accent:#E91E63;
+  --card:#fff;--card-border:#F8BBD0;--text:#2a0a14;--text-muted:#7a3a54;
+  --tab-bg:#880E4F;--badge-bg:#C2185B;--header-bg:#C2185B;
+}
+
+body{background:var(--bg);color:var(--text)}
+
+/* ===== TOAST ===== */
+.toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  background:#1a1a1a;border:1px solid #C84B2F;color:#fff;
+  padding:10px 22px;border-radius:30px;font-size:.85rem;font-weight:600;
+  z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+
+/* ===== COMMON BUTTON ===== */
+.abtn{
+  padding:8px 16px;border-radius:8px;font-size:.82rem;font-weight:700;
+  cursor:pointer;font-family:'Nunito',sans-serif;border:none;
+  transition:all .2s;
+}
+.abtn-primary{background:#C84B2F;color:#fff}
+.abtn-primary:hover{background:#9C3520}
+.abtn-ghost{background:transparent;border:1px solid #444;color:#ccc}
+.abtn-ghost:hover{border-color:#888;color:#fff}
+.abtn-danger{background:#7f1d1d;color:#fca5a5}
+.abtn-danger:hover{background:#991b1b}

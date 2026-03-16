@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title id="page-title">Menu</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/menu.css">
+</head>
+<body class="theme-classic">
+
+<!-- ===== HEADER ===== -->
+<div class="menu-header">
+  <h1 id="rest-name">Our Menu</h1>
+  <p id="rest-tagline">Scan QR · View Menu · Order Easy</p>
+  <div class="header-line"></div>
+</div>
+
+<!-- ===== TAB BAR ===== -->
+<div class="tab-bar" id="tab-bar"></div>
+
+<!-- ===== SEARCH & FILTER ===== -->
+<div id="search-filter-container"></div>
+
+<!-- ===== MENU BODY ===== -->
+<div class="menu-body" id="menu-body"></div>
+
+<!-- ===== FLOATING CART BTN ===== -->
+<div class="floating-cart-btn" id="floating-cart-btn" onclick="openCart()">
+  <div class="cart-icon-wrap">
+    🛒 <span class="cart-count-badge" id="cart-badge">0</span>
+  </div>
+  <span class="cart-text">VIEW ORDER</span>
+</div>
+
+<!-- ===== CART OVERLAY / BOTTOM SHEET ===== -->
+<div class="cart-overlay" id="cart-overlay" onclick="if(event.target===this)closeCart()">
+  <div class="cart-panel">
+    <div class="cart-header">
+      <h3>Your Order</h3>
+      <button class="close-cart" onclick="closeCart()">×</button>
+    </div>
+    
+    <div class="cart-items-wrap" id="cart-items-container">
+      <!-- Cart items injected here -->
+    </div>
+
+    <div class="checkout-area" id="cart-checkout-btn">
+      <div class="checkout-input-group">
+        <label>Table Number / Pick-up Note</label>
+        <input type="text" id="table-no" placeholder="e.g. Table 4 or Takeaway">
+      </div>
+      <div class="checkout-input-group">
+        <label>Your Name</label>
+        <input type="text" id="cust-name" placeholder="Optional">
+      </div>
+      <button class="checkout-btn" onclick="sendWhatsAppOrder()">
+        <span>ORDER VIA WHATSAPP</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADMIN LINK ===== -->
+<a href="admin.html" class="admin-trigger">⚙ ADMIN</a>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/menu.js"></script>
+</body>
+</html>

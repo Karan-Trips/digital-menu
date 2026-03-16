@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — KarQR</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body style="background:#0f0f0f">
+
+<div id="admin-login">
+  <div class="login-box">
+    <div class="login-logo">🍽️</div>
+    <h2>Admin Login</h2>
+    <p class="sub">Manage items, categories & themes</p>
+    <input type="password" id="pwd-input" placeholder="Enter your password">
+    <button class="login-submit" onclick="doLogin()">Login</button>
+    <p class="login-err" id="login-err">Wrong password. Try again.</p>
+    <a class="back-link" href="menu.html">← Back to Menu</a>
+  </div>
+</div>
+
+<div id="admin-panel">
+  <div class="admin-header">
+    <h2>🍽 Menu Manager</h2>
+    <div class="admin-header-btns">
+      <a href="menu.html" class="abtn abtn-ghost">← View Menu</a>
+      <button class="abtn abtn-primary" onclick="saveAll()">Save & Published</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+    <div class="admin-nav">
+      <button class="admin-nav-btn active" data-tab="info" onclick="showAdminTab('info')">Restaurant</button>
+      <button class="admin-nav-btn" data-tab="theme" onclick="showAdminTab('theme')">Theme</button>
+      <button class="admin-nav-btn" data-tab="cats" onclick="showAdminTab('cats')">Categories</button>
+      <button class="admin-nav-btn" data-tab="items" onclick="showAdminTab('items')">Menu Items</button>
+      <button class="admin-nav-btn" data-tab="settings" onclick="showAdminTab('settings')">Settings</button>
+    </div>
+
+    <!-- TAB: Restaurant Info -->
+    <div class="admin-tab-content active" id="tab-info">
+      <div class="admin-section">
+        <h3>Restaurant Info</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="inp-name">
+          </div>
+          <div class="form-group">
+            <label>Tagline</label>
+            <input type="text" id="inp-tagline">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>WhatsApp Number (Order receive)</label>
+            <input type="text" id="inp-whatsapp" placeholder="e.g. 916238093007">
+          </div>
+          <div class="form-group">
+            <label>Packing Note</label>
+            <input type="text" id="inp-packing">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Theme -->
+    <div class="admin-tab-content" id="tab-theme">
+      <div class="admin-section">
+        <h3>Menu Style / Theme</h3>
+        <div class="theme-grid">
+          <div class="theme-opt active" data-theme="theme-classic" onclick="pickTheme(this)"><div class="theme-swatch" style="background:#C84B2F"></div><div class="theme-name">Classic</div></div>
+          <div class="theme-opt" data-theme="theme-dark" onclick="pickTheme(this)"><div class="theme-swatch" style="background:#111"></div><div class="theme-name">Dark</div></div>
+          <div class="theme-opt" data-theme="theme-minimal" onclick="pickTheme(this)"><div class="theme-swatch" style="background:#f8f8f8"></div><div class="theme-name">Minimal</div></div>
+          <div class="theme-opt" data-theme="theme-green" onclick="pickTheme(this)"><div class="theme-swatch" style="background:#2E7D32"></div><div class="theme-name">Green</div></div>
+          <div class="theme-opt" data-theme="theme-street" onclick="pickTheme(this)"><div class="theme-swatch" style="background:#FF5722"></div><div class="theme-name">Street</div></div>
+          <div class="theme-opt" data-theme="theme-pastel" onclick="pickTheme(this)"><div class="theme-swatch" style="background:#FFF5F7"></div><div class="theme-name">Pastel</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Categories -->
+    <div class="admin-tab-content" id="tab-cats">
+      <div class="admin-section">
+        <h3>Categories</h3>
+        <div class="cat-list" id="cat-list"></div>
+        <div class="form-row">
+          <input type="text" id="new-cat-name" placeholder="New category name" style="flex:1;padding:10px;border-radius:8px;border:1px solid #333;background:#111;color:#fff">
+          <button class="abtn abtn-primary" onclick="addCategory()">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Menu Items -->
+    <div class="admin-tab-content" id="tab-items">
+      <div class="admin-section">
+        <h3>Items <span class="badge" id="item-count-badge">0</span></h3>
+        <div class="form-row" style="margin-bottom:12px">
+          <select id="filter-cat" onchange="renderItemsTable()" style="background:#111;color:#fff;border:1px solid #333;padding:8px;border-radius:8px;flex:1"></select>
+          <button class="abtn abtn-ghost" onclick="togglePriceSort()">Price <span id="price-sort-arrow">⬍</span></button>
+        </div>
+        <div class="table-wrap"><table class="items-table"><thead><tr><th>Item</th><th>Cat</th><th>Price</th><th>Actions</th></tr></thead><tbody id="items-tbody"></tbody></table></div>
+        
+        <div class="add-item-form">
+          <h4>+ New Item</h4>
+          <div class="form-row">
+            <input type="text" id="new-item-name" placeholder="Name" style="flex:2">
+            <input type="text" id="new-item-guj" placeholder="Gujarati (opt)">
+          </div>
+          <div class="form-row">
+            <input type="text" id="new-item-desc" placeholder="Desc" style="flex:3">
+            <input type="number" id="new-item-price" placeholder="Price">
+          </div>
+          <div class="form-row">
+            <input type="text" id="new-item-offer" placeholder="Offer (e.g. 10% OFF)" style="flex:1">
+            <select id="new-item-cat" style="flex:1"></select>
+          </div>
+          <div class="form-row">
+            <select id="new-item-type" style="flex:1">
+              <option value="card">Card</option>
+              <option value="thali">Thali</option>
+            </select>
+            <div style="display:flex;gap:10px;align-items:center;flex:1">
+              <label style="display:flex;align-items:center;gap:4px;font-size:.75rem;color:#888"><input type="checkbox" id="new-item-veg" checked> Veg</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:.75rem;color:#888"><input type="checkbox" id="new-item-pop"> Popular</label>
+              <label style="display:flex;align-items:center;gap:4px;font-size:.75rem;color:#888"><input type="checkbox" id="new-item-most"> Most Ordered</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <button class="abtn abtn-primary" style="width:100%" onclick="addItem()">+ Add Item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Settings -->
+    <div class="admin-tab-content" id="tab-settings">
+      <div class="admin-section">
+        <h3>Change Password</h3>
+        <input type="password" id="new-pwd" placeholder="New" style="width:100%;margin-bottom:10px;background:#111;color:#fff;border:1px solid #333;padding:12px;border-radius:8px">
+        <input type="password" id="confirm-pwd" placeholder="Confirm" style="width:100%;margin-bottom:10px;background:#111;color:#fff;border:1px solid #333;padding:12px;border-radius:8px">
+        <button class="abtn abtn-ghost" onclick="changePwd()">Update Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="edit-modal" onclick="if(event.target===this)closeEditModal()">
+  <div class="modal-box">
+    <div class="modal-title">Edit Item</div>
+    <div class="form-row"><input type="text" id="edit-item-name" placeholder="Name"><input type="text" id="edit-item-guj" placeholder="Gujarati"></div>
+    <div class="form-row"><input type="text" id="edit-item-desc" placeholder="Desc" style="flex:3"><input type="number" id="edit-item-price" placeholder="Price"></div>
+    <div class="form-row"><input type="text" id="edit-item-offer" placeholder="Offer text" style="flex:1"><select id="edit-item-cat" style="flex:1"></select></div>
+    <div class="form-row"><select id="edit-item-type"><option value="card">Card</option><option value="thali">Thali</option></select></div>
+    <div class="form-row" style="flex-wrap:wrap;gap:15px">
+      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-veg"> Veg</label>
+      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-avail"> Available</label>
+      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-pop"> Popular</label>
+      <label style="color:#888;font-size:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="edit-item-most"> Most Ordered</label>
+    </div>
+    <div class="modal-actions"><button class="abtn abtn-ghost" onclick="closeEditModal()">Close</button><button class="abtn abtn-primary" onclick="saveEditModal()">Save Changes</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/data.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

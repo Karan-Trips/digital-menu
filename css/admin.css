@@ -1,0 +1,161 @@
+/* ===== ADMIN LAYOUT ===== */
+#admin-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0f0f0f}
+
+/* ===== LOGIN BOX ===== */
+.login-box{
+  background:#1a1a1a;border:1px solid #333;border-radius:18px;
+  padding:40px 32px;width:340px;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.login-logo{font-size:2.5rem;margin-bottom:8px}
+.login-box h2{
+  font-family:'Playfair Display',serif;color:#fff;
+  font-size:1.6rem;margin-bottom:6px;
+}
+.login-box .sub{color:#666;font-size:.85rem;margin-bottom:28px}
+.login-box input{
+  width:100%;padding:12px 16px;background:#111;border:1px solid #333;
+  border-radius:10px;color:#fff;font-size:.95rem;
+  font-family:'Nunito',sans-serif;margin-bottom:14px;
+  outline:none;transition:border .2s;
+}
+.login-box input:focus{border-color:#C84B2F}
+.login-box .login-submit{
+  width:100%;padding:13px;background:#C84B2F;color:#fff;border:none;
+  border-radius:10px;font-size:1rem;font-weight:700;cursor:pointer;
+  font-family:'Nunito',sans-serif;transition:background .2s;
+}
+.login-box .login-submit:hover{background:#9C3520}
+.login-err{color:#ff6b6b;font-size:.82rem;margin-top:8px;display:none}
+.back-link{margin-top:18px;font-size:.78rem;color:#555;cursor:pointer;text-decoration:none;display:block}
+.back-link:hover{color:#888}
+
+/* ===== ADMIN PANEL ===== */
+#admin-panel{min-height:100vh;background:#0f0f0f;color:#eee;display:none}
+.admin-header{
+  background:#1a1a1a;border-bottom:1px solid #333;padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
+}
+.admin-header h2{font-family:'Playfair Display',serif;color:#fff;font-size:1.3rem}
+.admin-header-btns{display:flex;gap:10px}
+
+.admin-body{padding:20px;max-width:800px;margin:0 auto;padding-bottom:60px}
+
+/* ===== ADMIN NAV TABS ===== */
+.admin-nav{
+  display:flex;gap:6px;margin-bottom:20px;overflow-x:auto;
+  scrollbar-width:none;padding-bottom:4px;
+}
+.admin-nav::-webkit-scrollbar{display:none}
+.admin-nav-btn{
+  flex-shrink:0;padding:8px 16px;border-radius:8px;border:1.5px solid #2a2a2a;
+  background:transparent;color:#888;font-size:.8rem;font-weight:700;
+  cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.admin-nav-btn.active{background:#C84B2F;border-color:#C84B2F;color:#fff}
+.admin-nav-btn:hover:not(.active){border-color:#555;color:#ccc}
+
+/* ===== ADMIN SECTIONS ===== */
+.admin-tab-content{display:none}
+.admin-tab-content.active{display:block}
+
+.admin-section{
+  background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;
+  padding:20px;margin-bottom:18px;
+}
+.admin-section h3{
+  font-size:.95rem;font-weight:700;color:#fff;margin-bottom:16px;
+  padding-bottom:10px;border-bottom:1px solid #2a2a2a;
+  display:flex;align-items:center;gap:8px;
+}
+.admin-section h3 .badge{
+  background:#C84B2F;color:#fff;font-size:.7rem;
+  padding:2px 8px;border-radius:20px;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-row{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.form-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px}
+.form-group label{
+  font-size:.75rem;color:#888;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;
+}
+.form-group input,
+.form-group textarea,
+.form-group select{
+  background:#111;border:1px solid #333;border-radius:8px;
+  color:#eee;padding:9px 12px;font-size:.88rem;
+  font-family:'Nunito',sans-serif;outline:none;transition:border .2s;
+}
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus{border-color:#C84B2F}
+.form-group textarea{resize:vertical;min-height:60px}
+.form-group select option{background:#1a1a1a}
+
+/* ===== THEME PICKER ===== */
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.theme-opt{
+  border:2px solid #333;border-radius:10px;overflow:hidden;
+  cursor:pointer;transition:border-color .2s,transform .15s;
+}
+.theme-opt.active{border-color:#C84B2F}
+.theme-opt:hover{border-color:#666;transform:scale(1.03)}
+.theme-swatch{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 10px}
+.theme-name{font-size:.72rem;color:#ccc;padding:5px 8px;background:#111;text-align:center;font-weight:600}
+
+/* ===== CATEGORY LIST ===== */
+.cat-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.cat-item{
+  background:#111;border:1px solid #2a2a2a;border-radius:10px;
+  padding:12px 14px;display:flex;align-items:center;gap:10px;
+}
+.cat-item-name{flex:1;font-size:.9rem;color:#eee;font-weight:600}
+.cat-drag{color:#555;font-size:1.1rem}
+
+/* ===== ITEMS TABLE ===== */
+.table-wrap{overflow-x:auto}
+.items-table{width:100%;border-collapse:collapse;min-width:500px}
+.items-table th{
+  font-size:.72rem;color:#666;font-weight:700;letter-spacing:.5px;
+  text-align:left;padding:8px;border-bottom:1px solid #2a2a2a;
+  text-transform:uppercase;white-space:nowrap;
+}
+.items-table td{padding:8px;border-bottom:1px solid #1e1e1e;vertical-align:middle}
+.items-table tr:last-child td{border:none}
+.items-table tr:hover td{background:#1f1f1f}
+.item-row-name{font-size:.88rem;color:#eee;font-weight:600}
+.item-row-desc{font-size:.73rem;color:#666;margin-top:2px}
+.item-price{font-size:.88rem;color:#C84B2F;font-weight:700;white-space:nowrap}
+.item-actions{display:flex;gap:6px;justify-content:flex-end}
+.ibtn{padding:5px 10px;border-radius:6px;font-size:.75rem;font-weight:700;cursor:pointer;border:none;font-family:'Nunito',sans-serif;transition:background .15s}
+.ibtn-edit{background:#1e3a5f;color:#93c5fd}
+.ibtn-edit:hover{background:#1e4a7f}
+.ibtn-del{background:#3f1a1a;color:#fca5a5}
+.ibtn-del:hover{background:#5a1a1a}
+
+/* ===== ADD ITEM FORM ===== */
+.add-item-form{
+  background:#111;border:1px solid #2a2a2a;border-radius:10px;
+  padding:16px;margin-top:12px;
+}
+.add-item-form h4{
+  font-size:.8rem;color:#888;font-weight:700;margin-bottom:12px;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+
+/* ===== EDIT MODAL ===== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex}
+.modal-box{
+  background:#1a1a1a;border:1px solid #333;border-radius:16px;
+  padding:24px;width:100%;max-width:480px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.modal-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:18px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
